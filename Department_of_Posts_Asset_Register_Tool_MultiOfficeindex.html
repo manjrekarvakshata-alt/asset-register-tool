@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Department of Posts — Multi-Office Asset Register Tool</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-alt: #f8fafc;
+      --primary: #1e3a5f;
+      --primary-hover: #142842;
+      --accent: #2b6cb0;
+      --accent-soft: #ebf4ff;
+      --teal: #2c7a7b;
+      --teal-soft: #e6fffa;
+      --border: #cbd5e1;
+      --border-light: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --danger: #b91c1c;
+      --danger-soft: #fef2f2;
+      --success: #15803d;
+      --success-soft: #f0fdf4;
+      --warning: #b45309;
+      --warning-soft: #fffbeb;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    .app-shell {
+      max-width: 1580px;
+      margin: 14px auto;
+      padding: 0 16px 36px;
+    }
+
+    /* Header & Multi-Office Workspace Bar */
+    .official-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    .banner-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 14px;
+    }
+
+    .dept-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.2px;
+    }
+
+    .dept-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .header-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--success-soft);
+      color: var(--success);
+      border: 1px solid #bbf7d0;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .office-mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--primary);
+      border: 1px solid #bfdbfe;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .meta-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .meta-field input,
+    .meta-field select {
+      height: 33px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 12.5px;
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .meta-field input:focus,
+    .meta-field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.15);
+    }
+
+    .active-office-banner {
+      margin-top: 12px;
+      padding: 9px 12px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--teal);
+      border-radius: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    /* Navigation Tabs */
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: var(--surface-alt);
+    }
+
+    .tab-btn.active {
+      color: #ffffff;
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .tab-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0 6px 6px 6px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* Toolbar & Buttons */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-input,
+    .filter-select {
+      height: 33px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 12.5px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .search-input {
+      min-width: 210px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 33px;
+      padding: 0 12px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--primary);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-alt);
+    }
+
+    .btn-danger-outline {
+      background: var(--surface);
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger-soft);
+    }
+
+    .btn-icon {
+      height: 26px;
+      padding: 0 8px;
+      font-size: 11.5px;
+      border-radius: 4px;
+      border: 1px solid #fecaca;
+      background: var(--surface);
+      color: var(--danger);
+      cursor: pointer;
+    }
+
+    .btn-icon:hover {
+      background: var(--danger-soft);
+    }
+
+    /* Ledger Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    table.register-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1500px;
+      font-size: 12px;
+    }
+
+    table.register-table thead th {
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+      padding: 8px 6px;
+      border: 1px solid #2c4c73;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 1.25;
+    }
+
+    table.register-table tbody td {
+      border: 1px solid var(--border-light);
+      padding: 4px;
+      vertical-align: middle;
+    }
+
+    table.register-table tbody tr:nth-child(even) td {
+      background: var(--surface-alt);
+    }
+
+    table.register-table tbody tr:hover td {
+      background: var(--accent-soft);
+    }
+
+    .sl-cell {
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 4px 6px !important;
+    }
+
+    .cell-input,
+    .cell-select {
+      width: 100%;
+      height: 28px;
+      padding: 2px 6px;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      background: transparent;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .cell-input:focus,
+    .cell-select:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .num-input {
+      text-align: right;
+    }
+
+    .total-cell {
+      text-align: right;
+      font-weight: 600;
+      padding: 4px 8px !important;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    table.register-table tfoot td {
+      background: #e6eef4;
+      font-weight: 700;
+      color: var(--primary);
+      border: 1px solid var(--border);
+      padding: 8px;
+    }
+
+    .foot-right {
+      text-align: right;
+    }
+
+    /* Criteria Reports & Analytics Tab */
+    .criteria-panel {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+
+    .criteria-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .kpi-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 5px;
+      padding: 12px 14px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .kpi-value {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 4px;
+    }
+
+    .report-section-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 18px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 1024px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .summary-table th {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 7px 9px;
+      text-align: left;
+      border: 1px solid var(--primary);
+    }
+
+    .summary-table th.num,
+    .summary-table td.num {
+      text-align: right;
+    }
+
+    .summary-table td {
+      padding: 7px 9px;
+      border: 1px solid var(--border-light);
+    }
+
+    .summary-table tbody tr:nth-child(even) td {
+      background: var(--surface-alt);
+    }
+
+    .summary-table tr.total-row td {
+      background: #e6eef4;
+      font-weight: 700;
+      color: var(--primary);
+      border-top: 2px solid var(--primary);
+    }
+
+    .chart-box {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 14px;
+      background: var(--surface);
+    }
+
+    .chart-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    /* Office Deployment & Backup Tab */
+    .deploy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .deploy-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      background: var(--surface-alt);
+    }
+
+    .deploy-card h3 {
+      font-size: 14px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .deploy-card p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .steps-list {
+      padding-left: 18px;
+      font-size: 12.5px;
+      color: var(--text);
+    }
+
+    .steps-list li {
+      margin-bottom: 6px;
+    }
+
+    /* Verification & Sign-off Tab */
+    .signoff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .sign-card {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 14px;
+      background: var(--surface-alt);
+    }
+
+    .sign-card label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .sign-card input {
+      width: 100%;
+      height: 32px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #ffffff;
+      font-size: 12.5px;
+    }
+
+    .cert-box {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      background: #f8fafc;
+      border-radius: 5px;
+      padding: 16px;
+    }
+
+    .cert-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .cert-quote {
+      font-style: italic;
+      font-size: 13px;
+      color: var(--text);
+      margin: 8px 0 12px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+      body {
+        background: #ffffff;
+        font-size: 10px;
+      }
+      .app-shell {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+      }
+      .tab-bar,
+      .toolbar,
+      .status-pill,
+      .no-print {
+        display: none !important;
+      }
+      .tab-panel {
+        display: block !important;
+        border: none;
+        box-shadow: none;
+        padding: 8px 0;
+      }
+      .official-header {
+        box-shadow: none;
+        border: 1px solid #94a3b8;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+      }
+      .cell-input,
+      .cell-select {
+        border: none;
+        background: transparent;
+        padding: 0;
+        height: auto;
+        font-size: 9.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Official Header & Office Profile Switcher -->
+    <header class="official-header">
+      <div class="banner-top">
+        <div>
+          <div class="dept-title" id="headerOrgTitle">DEPARTMENT OF POSTS, INDIA — MULTI-OFFICE ASSET REGISTER TOOL</div>
+          <div class="dept-subtitle" id="headerOrgSubtitle">Standardized Office Asset Register, Criteria Reporting &amp; Annual Physical Verification</div>
+        </div>
+        <div class="header-badges">
+          <span class="office-mode-pill" id="activeOfficeBadge">Workspace: All Offices (Division View)</span>
+          <span class="status-pill" id="saveStatus">Saved Locally per Office</span>
+        </div>
+      </div>
+
+      <div class="meta-grid">
+        <div class="meta-field">
+          <label for="activeOfficeProfile">Current Office Workspace (Isolated Data)</label>
+          <select id="activeOfficeProfile"></select>
+        </div>
+        <div class="meta-field">
+          <label for="officeDisplayTitle">Office / Division Header Title</label>
+          <input type="text" id="officeDisplayTitle" placeholder="e.g. Sub Post Office / Division Office" />
+        </div>
+        <div class="meta-field">
+          <label for="refNo">Reference / Memo No.</label>
+          <input type="text" id="refNo" value="KWR/T/Asset Register/2015-16 (Ref: PMU/Asset Register/11)" />
+        </div>
+        <div class="meta-field">
+          <label for="finYear">Financial Year</label>
+          <input type="text" id="finYear" value="2026-27" />
+        </div>
+      </div>
+
+      <div class="active-office-banner">
+        <div>
+          <strong>Active Data Scope:</strong> <span id="scopeDescription">All offices in single shared ledger</span>
+        </div>
+        <div class="no-print" style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary" id="applyOfficeToNewBtn" style="height:27px; font-size:11.5px;">Set Default Office on New Rows</button>
+          <button type="button" class="btn btn-secondary" id="exportJsonBtn" style="height:27px; font-size:11.5px;">Export Office Backup (.JSON)</button>
+          <button type="button" class="btn btn-secondary" id="importJsonTriggerBtn" style="height:27px; font-size:11.5px;">Import Backup (.JSON)</button>
+          <input type="file" id="importJsonInput" accept=".json,application/json" style="display:none;" />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="tab-bar" role="tablist">
+      <button class="tab-btn active" data-tab="register" role="tab" aria-selected="true">1. Asset Register</button>
+      <button class="tab-btn" data-tab="reports" role="tab" aria-selected="false">2. Criteria Reports &amp; Summary</button>
+      <button class="tab-btn" data-tab="verification" role="tab" aria-selected="false">3. Verification &amp; Sign-off</button>
+      <button class="tab-btn" data-tab="deployment" role="tab" aria-selected="false">4. Multi-Office Guide</button>
+    </nav>
+
+    <!-- Tab 1: Asset Register -->
+    <section id="tab-register" class="tab-panel active" role="tabpanel">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" id="searchBox" class="search-input" placeholder="Search office, asset, category, serial no., remarks..." />
+          <select id="officeFilter" class="filter-select" aria-label="Filter by Office Name">
+            <option value="">All Offices</option>
+          </select>
+          <select id="typeFilter" class="filter-select" aria-label="Filter by Asset Type">
+            <option value="">All Asset Types</option>
+          </select>
+          <select id="categoryFilter" class="filter-select" aria-label="Filter by Category">
+            <option value="">All Categories</option>
+          </select>
+          <button type="button" class="btn btn-secondary" id="resetRegisterFiltersBtn">Reset Filters</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-primary" id="addRowBtn">+ Add Row</button>
+          <button type="button" class="btn btn-secondary" id="exportCsvBtn">Export CSV</button>
+          <button type="button" class="btn btn-secondary" id="printBtn">Print (A4 Landscape)</button>
+          <button type="button" class="btn btn-danger-outline" id="clearAllBtn">Clear Rows</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="register-table" id="assetTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Sl. No.</th>
+              <th style="width: 175px;">Office / SO Name</th>
+              <th style="width: 135px;">Type of the Asset</th>
+              <th style="width: 145px;">Category</th>
+              <th style="width: 165px;">Name of the Asset</th>
+              <th style="width: 200px;">Description (Hardware, Furniture, Office Equipment, Software, Others)</th>
+              <th style="width: 115px;">Serial No.</th>
+              <th style="width: 120px;">Date of Purchase / Installation</th>
+              <th style="width: 105px;">Rate per Unit (₹)</th>
+              <th style="width: 85px;">Total No. of Units</th>
+              <th style="width: 115px;">Total Value (₹)</th>
+              <th style="width: 145px;">Page No. &amp; Sl. No. of Stock Register</th>
+              <th style="width: 140px;">Remarks</th>
+              <th class="no-print" style="width: 60px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="registerBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="9" class="foot-right">TOTAL (VISIBLE / FILTERED ROWS)</td>
+              <td class="foot-right" id="footTotalUnits">0</td>
+              <td class="foot-right" id="footTotalValue">0.00</td>
+              <td colspan="2"></td>
+              <td class="no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab 2: Criteria Reports & Summary -->
+    <section id="tab-reports" class="tab-panel" role="tabpanel">
+      <div class="criteria-panel">
+        <div class="criteria-title">
+          <span>Custom Criteria Report Generator (Office Name + Type of Asset + Category)</span>
+          <button type="button" class="btn btn-secondary" id="clearCriteriaBtn" style="height:28px; font-size:12px;">Clear Criteria</button>
+        </div>
+        <div class="criteria-grid">
+          <div class="meta-field">
+            <label for="repOffice">Office Name</label>
+            <select id="repOffice">
+              <option value="">-- All Offices --</option>
+            </select>
+          </div>
+          <div class="meta-field">
+            <label for="repType">Type of Asset</label>
+            <select id="repType">
+              <option value="">-- All Asset Types --</option>
+            </select>
+          </div>
+          <div class="meta-field">
+            <label for="repCategory">Category</label>
+            <select id="repCategory">
+              <option value="">-- All Categories --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Matching Line Items</div>
+          <div class="kpi-value" id="kpiItems">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Matching Total Units</div>
+          <div class="kpi-value" id="kpiUnits">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Matching Total Value</div>
+          <div class="kpi-value" id="kpiValue">₹0.00</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Share of Register Value</div>
+          <div class="kpi-value" id="kpiShare">0.0%</div>
+        </div>
+      </div>
+
+      <div class="report-section-title">Filtered Asset Items Matching Selected Criteria</div>
+      <div class="table-wrap" style="margin-bottom: 18px;">
+        <table class="summary-table" id="criteriaMatchesTable">
+          <thead>
+            <tr>
+              <th>Sl.</th>
+              <th>Office / SO Name</th>
+              <th>Type of Asset</th>
+              <th>Category</th>
+              <th>Name of Asset</th>
+              <th>Serial No.</th>
+              <th class="num">Rate (₹)</th>
+              <th class="num">Units</th>
+              <th class="num">Total Value (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="criteriaMatchesBody"></tbody>
+        </table>
+      </div>
+
+      <div class="analytics-grid">
+        <div>
+          <div class="report-section-title" style="margin-top:0;">Report by Type of Asset</div>
+          <table class="summary-table" id="reportByTypeTable">
+            <thead>
+              <tr>
+                <th>Type of Asset</th>
+                <th class="num">Items</th>
+                <th class="num">Total Units</th>
+                <th class="num">Total Value (₹)</th>
+                <th class="num">% Value</th>
+              </tr>
+            </thead>
+            <tbody id="reportByTypeBody"></tbody>
+          </table>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-title">Asset Value by Type of Asset (₹)</div>
+          <svg id="summaryChart" viewBox="0 0 420 230" width="100%" height="220" aria-label="Asset Value Chart"></svg>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <div>
+          <div class="report-section-title" style="margin-top:0;">Report by Category</div>
+          <table class="summary-table" id="reportByCategoryTable">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th class="num">Items</th>
+                <th class="num">Total Units</th>
+                <th class="num">Total Value (₹)</th>
+                <th class="num">% Value</th>
+              </tr>
+            </thead>
+            <tbody id="reportByCategoryBody"></tbody>
+          </table>
+        </div>
+
+        <div>
+          <div class="report-section-title" style="margin-top:0;">Report by Office Name</div>
+          <div style="max-height: 410px; overflow-y: auto; border: 1px solid var(--border-light);">
+            <table class="summary-table" id="reportByOfficeTable">
+              <thead>
+                <tr>
+                  <th>Office / SO Name</th>
+                  <th class="num">Items</th>
+                  <th class="num">Total Units</th>
+                  <th class="num">Total Value (₹)</th>
+                  <th class="num">% Value</th>
+                </tr>
+              </thead>
+              <tbody id="reportByOfficeBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Verification & Sign-off -->
+    <section id="tab-verification" class="tab-panel" role="tabpanel">
+      <div class="signoff-grid">
+        <div class="sign-card">
+          <label for="sigOA">Signature of the OA</label>
+          <input type="text" id="sigOA" placeholder="Enter name / sign-off note" />
+        </div>
+        <div class="sign-card">
+          <label for="sigASP">Physically verified by ASP(HQ)</label>
+          <input type="text" id="sigASP" placeholder="Enter name &amp; verification date" />
+        </div>
+        <div class="sign-card">
+          <label for="sigEnteredBy">Data Entered in Software By</label>
+          <input type="text" id="sigEnteredBy" placeholder="Enter operator name / ID" />
+        </div>
+        <div class="sign-card">
+          <label for="sigSPO">Signature of SPO</label>
+          <input type="text" id="sigSPO" placeholder="Superintendent of Post Offices / Postmaster" />
+        </div>
+      </div>
+
+      <div class="cert-box">
+        <div class="cert-header">
+          <span>Annual Physical Verification Certificate (Overleaf)</span>
+          <label class="no-print" style="font-weight: 600; font-size: 12px; cursor: pointer;">
+            <input type="checkbox" id="includeCert" checked /> Include on Print
+          </label>
+        </div>
+        <div class="cert-quote">
+          &ldquo;All the assets (Hardware) are physically verified with the office record and found correct.&rdquo;
+        </div>
+        <div class="meta-grid">
+          <div class="meta-field">
+            <label for="certOfficer">Postmaster / Sub Postmaster</label>
+            <input type="text" id="certOfficer" placeholder="Name &amp; Designation" />
+          </div>
+          <div class="meta-field">
+            <label for="certDate">Verification Date</label>
+            <input type="date" id="certDate" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Multi-Office Usage Guide -->
+    <section id="tab-deployment" class="tab-panel" role="tabpanel">
+      <div class="deploy-grid">
+        <div class="deploy-card">
+          <h3>How Offices Use This Tool</h3>
+          <p>Designed so individual Sub Offices (S.O), Head Offices (H.O), or the Divisional Office (DO) can maintain independent registers or consolidate records.</p>
+          <ol class="steps-list">
+            <li><strong>Select Office Workspace:</strong> Choose <em>All Offices (Shared Register)</em> or pick a specific office in <em>Current Office Workspace</em> to keep each office's data isolated in browser storage.</li>
+            <li><strong>Enter &amp; Classify Assets:</strong> Select <em>Office / SO Name</em>, <em>Type of the Asset</em>, and <em>Category</em> (including office furniture items such as tables, chairs, and almirahs) from standardized dropdowns.</li>
+            <li><strong>Generate Criteria Reports:</strong> Open <em>Criteria Reports &amp; Summary</em> to filter by Office Name, Type of Asset, and Category in any combination.</li>
+            <li><strong>Export &amp; Archive:</strong> Export <code>.CSV</code> for spreadsheet submission or <code>.JSON</code> backup to share/restore across systems.</li>
+          </ol>
+        </div>
+
+        <div class="deploy-card">
+          <h3>Sharing &amp; Backup Best Practices</h3>
+          <p>Because this runs directly in the browser with no external server dependency, each computer stores data locally under its selected workspace key.</p>
+          <ul class="steps-list">
+            <li>Use <strong>Export Office Backup (.JSON)</strong> before clearing browsers or transferring a register to another machine.</li>
+            <li>Use <strong>Import Backup (.JSON)</strong> to load an office's saved JSON snapshot into any office workspace.</li>
+            <li>Use <strong>Export CSV</strong> when submitting consolidated tables or importing into Excel/LibreOffice Calc.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_PREFIX = "dop_asset_register_tool_v12_";
+    const ASSET_TYPES = ["Hardware", "Furniture", "Office Equipment", "Software", "Others"];
+    const OFFICE_NAMES = ["Angadi S.O (Uttara Kannada)", "Ankola S.O", "Asnoti S.O", "Aversa S.O", "Bankikodla S.O", "Belekeri S.O", "Bhatkal Bazar S.O", "Bhatkal S.O", "Binaga S.O", "Chandavar S.O", "Chendiye S.O", "Gersoppa Jyothinagar S.O", "Gokarn S.O", "Gudeangadi S.O", "Habbuwada S.O", "Hadinbal S.O", "Haldipur S.O", "Halge S.O", "Hegde S.O", "Herwatta S.O", "Hiregutti S.O", "Honavar S.O", "Hosad S.O", "Kadra S.O", "Kadtoka S.O", "Kadwad S.O", "Kaiga S.O", "Kaikini S.O", "Karki S.O", "Karwar Baitkhol S.O", "(Blank / Karwar H.O)", "Karwar Market S.O", "Karwar Naval Base S.O", "Kasarkod S.O", "Kodibag S.O", "Kumta H.O", "Kumta Kanara College Road S.O", "Kumta Kutchery S.O", "Madangeri S.O", "Majali S.O", "Manki S.O", "Melin Idgunji S.O", "Mirjan S.O", "Murdeshwar S.O", "Nandangadda S.O", "Prabhatnagar S.O", "Sadashivgad S.O", "Shetgeri S.O", "Shirali Bazar S.O", "Shirali S.O", "Vandige S.O", "Karwar DO"];
+    const CATEGORIES = ["Desktop", "Laptop", "Printer", "Barcode Scanner", "Passbook printer", "Genset", "Monitor", "Keyboard", "Mouse", "others", "tables", "revolving chairs", "plastic chairs", "wooden chairs", "almirahs"];
+    const PIN_MAP = {"Angadi S.O (Uttara Kannada)": "581360", "Ankola S.O": "581314", "Asnoti S.O": "581317", "Aversa S.O": "581316", "Bankikodla S.O": "581319", "Belekeri S.O": "581321", "Bhatkal Bazar S.O": "581320", "Bhatkal S.O": "581320", "Binaga S.O": "581307", "Chandavar S.O": "581323", "Chendiye S.O": "581324", "Gersoppa Jyothinagar S.O": "581384", "Gokarn S.O": "581326", "Gudeangadi S.O": "581351", "Habbuwada S.O": "581306", "Hadinbal S.O": "581361", "Haldipur S.O": "581327", "Halge S.O": "581328", "Hegde S.O": "581330", "Herwatta S.O": "581332"};
+
+    // Workspace keys: "__ALL__" for shared/all-offices register, or specific office name for isolated office register
+    const WORKSPACE_OPTIONS = [
+      { value: "__ALL__", label: "All Offices (Shared / Division Register)" },
+      ...OFFICE_NAMES.map((name) => ({
+        value: name,
+        label: PIN_MAP[name] ? `${name} (PIN: ${PIN_MAP[name]})` : name
+      }))
+    ];
+
+    function makeDefaultState(workspaceKey) {
+      const isSpecificOffice = workspaceKey && workspaceKey !== "__ALL__";
+      const defaultOfficeName = isSpecificOffice ? workspaceKey : "Angadi S.O (Uttara Kannada)";
+      return {
+        workspaceKey: workspaceKey || "__ALL__",
+        officeDisplayTitle: isSpecificOffice
+          ? `DEPARTMENT OF POSTS, INDIA — ${workspaceKey.toUpperCase()}`
+          : "DEPARTMENT OF POSTS, INDIA — OFFICE OF THE SPO, KARWAR DIVISION (KARWAR - 581301)",
+        refNo: "KWR/T/Asset Register/2015-16 (Ref: PMU/Asset Register/11)",
+        finYear: "2026-27",
+        defaultOfficeForNewRows: isSpecificOffice ? workspaceKey : "",
+        sigOA: "",
+        sigASP: "",
+        sigEnteredBy: "",
+        sigSPO: "",
+        certOfficer: "",
+        certDate: "",
+        includeCert: true,
+        rows: [
+          {
+            officeName: defaultOfficeName,
+            assetType: "Hardware",
+            category: "Desktop",
+            assetName: "Desktop Computer Set",
+            description: "Desktop system with monitor, keyboard & mouse",
+            serialNo: "SN-001",
+            purchaseDate: "2024-06-15",
+            rate: 48500,
+            units: 1,
+            stockRef: "Vol-I / P.12 / Sl.4",
+            remarks: ""
+          },
+          {
+            officeName: defaultOfficeName,
+            assetType: "Furniture",
+            category: "almirahs",
+            assetName: "Steel Almirah",
+            description: "Office storage almirah",
+            serialNo: "ALM-002",
+            purchaseDate: "2023-11-20",
+            rate: 14200,
+            units: 1,
+            stockRef: "Vol-I / P.28 / Sl.9",
+            remarks: ""
+          }
+        ]
+      };
+    }
+
+    let currentWorkspace = localStorage.getItem(STORAGE_PREFIX + "last_workspace") || "__ALL__";
+    let state = loadWorkspaceState(currentWorkspace);
+
+    function getStorageKey(wsKey) {
+      return STORAGE_PREFIX + encodeURIComponent(wsKey || "__ALL__");
+    }
+
+    function loadWorkspaceState(wsKey) {
+      const fallback = makeDefaultState(wsKey);
+      try {
+        const raw = localStorage.getItem(getStorageKey(wsKey));
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return {
+          ...fallback,
+          ...parsed,
+          workspaceKey: wsKey,
+          rows: Array.isArray(parsed.rows) ? parsed.rows : fallback.rows
+        };
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_PREFIX + "last_workspace", currentWorkspace);
+        localStorage.setItem(getStorageKey(currentWorkspace), JSON.stringify(state));
+        const badge = document.getElementById("saveStatus");
+        badge.textContent = "Saved Locally";
+      } catch {
+        // ignore storage quota errors
+      }
+    }
+
+    function formatINR(num) {
+      return Number(num || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function formatInt(num) {
+      return Number(num || 0).toLocaleString("en-IN", {
+        maximumFractionDigits: 0
+      });
+    }
+
+    function populateDropdowns() {
+      const wsSelect = document.getElementById("activeOfficeProfile");
+      wsSelect.innerHTML = "";
+      WORKSPACE_OPTIONS.forEach((optItem) => {
+        const opt = document.createElement("option");
+        opt.value = optItem.value;
+        opt.textContent = optItem.label;
+        if (optItem.value === currentWorkspace) opt.selected = true;
+        wsSelect.appendChild(opt);
+      });
+
+      // Register filter dropdowns
+      const officeFilter = document.getElementById("officeFilter");
+      officeFilter.innerHTML = '<option value="">All Offices</option>';
+      OFFICE_NAMES.forEach((o) => {
+        const opt = document.createElement("option");
+        opt.value = o;
+        opt.textContent = o;
+        officeFilter.appendChild(opt);
+      });
+
+      const typeFilter = document.getElementById("typeFilter");
+      typeFilter.innerHTML = '<option value="">All Asset Types</option>';
+      ASSET_TYPES.forEach((t) => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        typeFilter.appendChild(opt);
+      });
+
+      const categoryFilter = document.getElementById("categoryFilter");
+      categoryFilter.innerHTML = '<option value="">All Categories</option>';
+      CATEGORIES.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        categoryFilter.appendChild(opt);
+      });
+
+      // Criteria report dropdowns
+      const repOffice = document.getElementById("repOffice");
+      repOffice.innerHTML = '<option value="">-- All Offices --</option>';
+      OFFICE_NAMES.forEach((o) => {
+        const opt = document.createElement("option");
+        opt.value = o;
+        opt.textContent = o;
+        repOffice.appendChild(opt);
+      });
+
+      const repType = document.getElementById("repType");
+      repType.innerHTML = '<option value="">-- All Asset Types --</option>';
+      ASSET_TYPES.forEach((t) => {
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        repType.appendChild(opt);
+      });
+
+      const repCategory = document.getElementById("repCategory");
+      repCategory.innerHTML = '<option value="">-- All Categories --</option>';
+      CATEGORIES.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        repCategory.appendChild(opt);
+      });
+    }
+
+    function syncHeaderAndMetaInputs() {
+      document.getElementById("officeDisplayTitle").value = state.officeDisplayTitle || "";
+      document.getElementById("refNo").value = state.refNo || "";
+      document.getElementById("finYear").value = state.finYear || "";
+
+      document.getElementById("headerOrgTitle").textContent =
+        state.officeDisplayTitle || "DEPARTMENT OF POSTS, INDIA — MULTI-OFFICE ASSET REGISTER TOOL";
+
+      const badge = document.getElementById("activeOfficeBadge");
+      const scopeDesc = document.getElementById("scopeDescription");
+      if (currentWorkspace === "__ALL__") {
+        badge.textContent = "Workspace: All Offices (Shared)";
+        scopeDesc.textContent = "Shared multi-office register across all offices";
+      } else {
+        const pinInfo = PIN_MAP[currentWorkspace] ? ` (PIN: ${PIN_MAP[currentWorkspace]})` : "";
+        badge.textContent = `Workspace: ${currentWorkspace}${pinInfo}`;
+        scopeDesc.textContent = `Dedicated isolated register for ${currentWorkspace}${pinInfo}`;
+      }
+
+      const metaIds = ["sigOA", "sigASP", "sigEnteredBy", "sigSPO", "certOfficer", "certDate"];
+      metaIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.value = state[id] || "";
+      });
+
+      const certCheck = document.getElementById("includeCert");
+      if (certCheck) certCheck.checked = Boolean(state.includeCert);
+    }
+
+    function bindMetaInputs() {
+      document.getElementById("activeOfficeProfile").addEventListener("change", (e) => {
+        currentWorkspace = e.target.value;
+        state = loadWorkspaceState(currentWorkspace);
+        saveState();
+        syncHeaderAndMetaInputs();
+        // If a specific office workspace is selected, pre-filter officeFilter unless user changes it
+        document.getElementById("officeFilter").value = currentWorkspace !== "__ALL__" ? currentWorkspace : "";
+        document.getElementById("repOffice").value = currentWorkspace !== "__ALL__" ? currentWorkspace : "";
+        renderRegister();
+        renderReports();
+      });
+
+      document.getElementById("officeDisplayTitle").addEventListener("input", (e) => {
+        state.officeDisplayTitle = e.target.value;
+        document.getElementById("headerOrgTitle").textContent =
+          state.officeDisplayTitle || "DEPARTMENT OF POSTS, INDIA — MULTI-OFFICE ASSET REGISTER TOOL";
+        saveState();
+      });
+
+      ["refNo", "finYear", "sigOA", "sigASP", "sigEnteredBy", "sigSPO", "certOfficer", "certDate"].forEach((id) => {
+        const el = document.getElementById(id);
+        el.addEventListener("input", () => {
+          state[id] = el.value;
+          saveState();
+        });
+      });
+
+      document.getElementById("includeCert").addEventListener("change", (e) => {
+        state.includeCert = e.target.checked;
+        saveState();
+      });
+
+      document.getElementById("applyOfficeToNewBtn").addEventListener("click", () => {
+        if (currentWorkspace === "__ALL__") {
+          alert("Select a specific office workspace first to set it as default for new rows.");
+          return;
+        }
+        state.defaultOfficeForNewRows = currentWorkspace;
+        saveState();
+        alert(`Default Office / SO Name for new rows set to: ${currentWorkspace}`);
+      });
+    }
+
+    function bindTabs() {
+      const buttons = document.querySelectorAll(".tab-btn");
+      const panels = document.querySelectorAll(".tab-panel");
+      buttons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.tab;
+          buttons.forEach((b) => {
+            const active = b === btn;
+            b.classList.toggle("active", active);
+            b.setAttribute("aria-selected", String(active));
+          });
+          panels.forEach((p) => {
+            p.classList.toggle("active", p.id === `tab-${target}`);
+          });
+          if (target === "reports") {
+            renderReports();
+          }
+        });
+      });
+    }
+
+    function renderRegister() {
+      const tbody = document.getElementById("registerBody");
+      const query = document.getElementById("searchBox").value.trim().toLowerCase();
+      const officeFilter = document.getElementById("officeFilter").value;
+      const typeFilter = document.getElementById("typeFilter").value;
+      const categoryFilter = document.getElementById("categoryFilter").value;
+
+      tbody.innerHTML = "";
+      let totalUnits = 0;
+      let totalValue = 0;
+
+      state.rows.forEach((row, idx) => {
+        const matchesOffice = !officeFilter || row.officeName === officeFilter;
+        const matchesType = !typeFilter || row.assetType === typeFilter;
+        const matchesCategory = !categoryFilter || row.category === categoryFilter;
+
+        const searchableText = [
+          row.officeName,
+          row.assetType,
+          row.category,
+          row.assetName,
+          row.description,
+          row.serialNo,
+          row.purchaseDate,
+          row.stockRef,
+          row.remarks
+        ]
+          .join(" ")
+          .toLowerCase();
+        const matchesQuery = !query || searchableText.includes(query);
+        const visible = matchesOffice && matchesType && matchesCategory && matchesQuery;
+
+        const rate = parseFloat(row.rate) || 0;
+        const units = parseFloat(row.units) || 0;
+        const rowVal = rate * units;
+
+        if (visible) {
+          totalUnits += units;
+          totalValue += rowVal;
+        }
+
+        const tr = document.createElement("tr");
+        if (!visible) {
+          tr.style.display = "none";
+        }
+
+        const slTd = document.createElement("td");
+        slTd.className = "sl-cell";
+        slTd.textContent = String(idx + 1);
+        tr.appendChild(slTd);
+
+        tr.appendChild(makeSelectCell(row, "officeName", OFFICE_NAMES, "-- Select Office --"));
+        tr.appendChild(makeSelectCell(row, "assetType", ASSET_TYPES, "-- Select Type --"));
+        tr.appendChild(makeSelectCell(row, "category", CATEGORIES, "-- Select Category --"));
+        tr.appendChild(makeTextCell(row, "assetName", "Asset name"));
+        tr.appendChild(makeTextCell(row, "description", "Hardware / Furniture / Office Equipment / Software / Others"));
+        tr.appendChild(makeTextCell(row, "serialNo", "Serial no."));
+        tr.appendChild(makeDateCell(row, "purchaseDate"));
+        tr.appendChild(makeNumberCell(row, "rate", true, () => renderRegister()));
+        tr.appendChild(makeNumberCell(row, "units", false, () => renderRegister()));
+
+        const valTd = document.createElement("td");
+        valTd.className = "total-cell";
+        valTd.textContent = formatINR(rowVal);
+        tr.appendChild(valTd);
+
+        tr.appendChild(makeTextCell(row, "stockRef", "Page & Sl. no."));
+        tr.appendChild(makeTextCell(row, "remarks", "Remarks"));
+
+        const actTd = document.createElement("td");
+        actTd.className = "no-print";
+        actTd.style.textAlign = "center";
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "btn-icon";
+        delBtn.textContent = "Del";
+        delBtn.title = "Delete row";
+        delBtn.addEventListener("click", () => {
+          state.rows.splice(idx, 1);
+          saveState();
+          renderRegister();
+        });
+        actTd.appendChild(delBtn);
+        tr.appendChild(actTd);
+
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("footTotalUnits").textContent = formatInt(totalUnits);
+      document.getElementById("footTotalValue").textContent = formatINR(totalValue);
+    }
+
+    function makeTextCell(row, key, placeholder) {
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "cell-input";
+      input.value = row[key] || "";
+      input.placeholder = placeholder;
+      input.addEventListener("input", () => {
+        row[key] = input.value;
+        saveState();
+      });
+      td.appendChild(input);
+      return td;
+    }
+
+    function makeSelectCell(row, key, optionsArr, placeholderLabel) {
+      const td = document.createElement("td");
+      const select = document.createElement("select");
+      select.className = "cell-select";
+
+      const blankOpt = document.createElement("option");
+      blankOpt.value = "";
+      blankOpt.textContent = placeholderLabel;
+      select.appendChild(blankOpt);
+
+      if (row[key] && !optionsArr.includes(row[key])) {
+        const customOpt = document.createElement("option");
+        customOpt.value = row[key];
+        customOpt.textContent = row[key];
+        customOpt.selected = true;
+        select.appendChild(customOpt);
+      }
+
+      optionsArr.forEach((optVal) => {
+        const opt = document.createElement("option");
+        opt.value = optVal;
+        opt.textContent = optVal;
+        if (row[key] === optVal) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener("change", () => {
+        row[key] = select.value;
+        saveState();
+      });
+      td.appendChild(select);
+      return td;
+    }
+
+    function makeDateCell(row, key) {
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "date";
+      input.className = "cell-input";
+      input.value = row[key] || "";
+      input.addEventListener("change", () => {
+        row[key] = input.value;
+        saveState();
+      });
+      td.appendChild(input);
+      return td;
+    }
+
+    function makeNumberCell(row, key, isDecimal, onRecalc) {
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "number";
+      input.step = isDecimal ? "0.01" : "1";
+      input.min = "0";
+      input.className = "cell-input num-input";
+      input.value = row[key] ?? "";
+      input.addEventListener("input", () => {
+        row[key] = input.value === "" ? "" : Number(input.value);
+        saveState();
+        if (onRecalc) onRecalc();
+      });
+      td.appendChild(input);
+      return td;
+    }
+
+    function renderReports() {
+      const selOffice = document.getElementById("repOffice").value;
+      const selType = document.getElementById("repType").value;
+      const selCategory = document.getElementById("repCategory").value;
+
+      let grandUnits = 0;
+      let grandValue = 0;
+
+      const typeStats = {};
+      ASSET_TYPES.forEach((t) => { typeStats[t] = { items: 0, units: 0, value: 0 }; });
+
+      const catStats = {};
+      CATEGORIES.forEach((c) => { catStats[c] = { items: 0, units: 0, value: 0 }; });
+
+      const offStats = {};
+      OFFICE_NAMES.forEach((o) => { offStats[o] = { items: 0, units: 0, value: 0 }; });
+
+      const matchedRows = [];
+
+      state.rows.forEach((r, idx) => {
+        const rate = parseFloat(r.rate) || 0;
+        const units = parseFloat(r.units) || 0;
+        const val = rate * units;
+
+        grandUnits += units;
+        grandValue += val;
+
+        if (typeStats[r.assetType]) {
+          typeStats[r.assetType].items += 1;
+          typeStats[r.assetType].units += units;
+          typeStats[r.assetType].value += val;
+        }
+        if (catStats[r.category]) {
+          catStats[r.category].items += 1;
+          catStats[r.category].units += units;
+          catStats[r.category].value += val;
+        }
+        if (offStats[r.officeName]) {
+          offStats[r.officeName].items += 1;
+          offStats[r.officeName].units += units;
+          offStats[r.officeName].value += val;
+        }
+
+        const okOffice = !selOffice || r.officeName === selOffice;
+        const okType = !selType || r.assetType === selType;
+        const okCat = !selCategory || r.category === selCategory;
+        if (okOffice && okType && okCat) {
+          matchedRows.push({ ...r, sl: idx + 1, rate, units, val });
+        }
+      });
+
+      const matchUnits = matchedRows.reduce((acc, item) => acc + item.units, 0);
+      const matchValue = matchedRows.reduce((acc, item) => acc + item.val, 0);
+      const sharePct = grandValue > 0 ? ((matchValue / grandValue) * 100).toFixed(1) + "%" : "0.0%";
+
+      document.getElementById("kpiItems").textContent = formatInt(matchedRows.length);
+      document.getElementById("kpiUnits").textContent = formatInt(matchUnits);
+      document.getElementById("kpiValue").textContent = "₹" + formatINR(matchValue);
+      document.getElementById("kpiShare").textContent = sharePct;
+
+      // Render filtered matches table
+      const mBody = document.getElementById("criteriaMatchesBody");
+      mBody.innerHTML = "";
+      if (matchedRows.length === 0) {
+        mBody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#64748b; padding:12px;">No asset rows match the selected criteria.</td></tr>';
+      } else {
+        matchedRows.forEach((m) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${m.sl}</td>
+            <td>${escapeHtml(m.officeName || "-")}</td>
+            <td>${escapeHtml(m.assetType || "-")}</td>
+            <td>${escapeHtml(m.category || "-")}</td>
+            <td>${escapeHtml(m.assetName || "-")}</td>
+            <td>${escapeHtml(m.serialNo || "-")}</td>
+            <td class="num">${formatINR(m.rate)}</td>
+            <td class="num">${formatInt(m.units)}</td>
+            <td class="num">${formatINR(m.val)}</td>
+          `;
+          mBody.appendChild(tr);
+        });
+        const totM = document.createElement("tr");
+        totM.className = "total-row";
+        totM.innerHTML = `
+          <td colspan="7">MATCHED TOTAL (${matchedRows.length} items)</td>
+          <td class="num">${formatInt(matchUnits)}</td>
+          <td class="num">${formatINR(matchValue)}</td>
+        `;
+        mBody.appendChild(totM);
+      }
+
+      // Render Report by Type of Asset
+      renderBreakdownTable("reportByTypeBody", ASSET_TYPES, typeStats, state.rows.length, grandUnits, grandValue);
+
+      // Render Report by Category
+      renderBreakdownTable("reportByCategoryBody", CATEGORIES, catStats, state.rows.length, grandUnits, grandValue);
+
+      // Render Report by Office Name
+      renderBreakdownTable("reportByOfficeBody", OFFICE_NAMES, offStats, state.rows.length, grandUnits, grandValue);
+
+      // Draw Bar Chart by Type
+      drawBarChart(typeStats);
+    }
+
+    function renderBreakdownTable(tbodyId, keys, statsMap, totalItems, totalUnits, totalValue) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = "";
+      keys.forEach((k) => {
+        const st = statsMap[k] || { items: 0, units: 0, value: 0 };
+        const pct = totalValue > 0 ? ((st.value / totalValue) * 100).toFixed(1) + "%" : "0.0%";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(k)}</td>
+          <td class="num">${formatInt(st.items)}</td>
+          <td class="num">${formatInt(st.units)}</td>
+          <td class="num">${formatINR(st.value)}</td>
+          <td class="num">${pct}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      const totTr = document.createElement("tr");
+      totTr.className = "total-row";
+      totTr.innerHTML = `
+        <td>TOTAL</td>
+        <td class="num">${formatInt(totalItems)}</td>
+        <td class="num">${formatInt(totalUnits)}</td>
+        <td class="num">${formatINR(totalValue)}</td>
+        <td class="num">${totalValue > 0 ? "100.0%" : "0.0%"}</td>
+      `;
+      tbody.appendChild(totTr);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function drawBarChart(stats) {
+      const svg = document.getElementById("summaryChart");
+      const maxVal = Math.max(1, ...ASSET_TYPES.map((t) => stats[t].value));
+      const chartTop = 20;
+      const chartHeight = 155;
+      const barWidth = 52;
+      const gap = 24;
+      const startX = 48;
+
+      let markup = `
+        <line x1="38" y1="${chartTop + chartHeight}" x2="405" y2="${chartTop + chartHeight}" stroke="#94a3b8" stroke-width="1" />
+      `;
+
+      ASSET_TYPES.forEach((t, i) => {
+        const val = stats[t].value;
+        const barH = Math.round((val / maxVal) * (chartHeight - 20));
+        const x = startX + i * (barWidth + gap);
+        const y = chartTop + chartHeight - barH;
+        const shortLabel = t === "Office Equipment" ? "Office Eq." : t;
+
+        markup += `
+          <rect x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="3" fill="#2b6cb0" />
+          <text x="${x + barWidth / 2}" y="${y - 5}" text-anchor="middle" font-size="9.5" fill="#1e3a5f" font-weight="600">
+            ${val > 0 ? Math.round(val).toLocaleString("en-IN") : "0"}
+          </text>
+          <text x="${x + barWidth / 2}" y="${chartTop + chartHeight + 16}" text-anchor="middle" font-size="10" fill="#475569">
+            ${shortLabel}
+          </text>
+        `;
+      });
+
+      svg.innerHTML = markup;
+    }
+
+    function exportCsv() {
+      const headers = [
+        "Sl. No.",
+        "Office / SO Name",
+        "Type of the Asset",
+        "Category",
+        "Name of the Asset",
+        "Description (Hardware, Furniture, Office Equipment, Software, Others)",
+        "Serial No.",
+        "Date of Purchase / Installation",
+        "Rate per Unit",
+        "Total No. of Units",
+        "Total Value",
+        "Page No. & Sl. No. of Stock Register",
+        "Remarks"
+      ];
+
+      const escapeCsv = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const lines = [headers.map(escapeCsv).join(",")];
+
+      state.rows.forEach((r, i) => {
+        const rate = parseFloat(r.rate) || 0;
+        const units = parseFloat(r.units) || 0;
+        const total = (rate * units).toFixed(2);
+        lines.push(
+          [
+            i + 1,
+            r.officeName,
+            r.assetType,
+            r.category,
+            r.assetName,
+            r.description,
+            r.serialNo,
+            r.purchaseDate,
+            rate.toFixed(2),
+            units,
+            total,
+            r.stockRef,
+            r.remarks
+          ]
+            .map(escapeCsv)
+            .join(",")
+        );
+      });
+
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const safeName = (currentWorkspace === "__ALL__" ? "All_Offices" : currentWorkspace).replace(/[^a-zA-Z0-9_-]+/g, "_");
+      a.download = `Asset_Register_${safeName}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportJsonBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const safeName = (currentWorkspace === "__ALL__" ? "All_Offices" : currentWorkspace).replace(/[^a-zA-Z0-9_-]+/g, "_");
+      a.download = `Asset_Register_Backup_${safeName}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJsonBackup(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (!parsed || !Array.isArray(parsed.rows)) {
+            alert("Invalid backup JSON format: missing 'rows' array.");
+            return;
+          }
+          state = {
+            ...makeDefaultState(currentWorkspace),
+            ...parsed,
+            workspaceKey: currentWorkspace
+          };
+          saveState();
+          syncHeaderAndMetaInputs();
+          renderRegister();
+          renderReports();
+          alert("Backup imported successfully.");
+        } catch {
+          alert("Could not parse the selected JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    document.getElementById("addRowBtn").addEventListener("click", () => {
+      const defaultOff = state.defaultOfficeForNewRows || (currentWorkspace !== "__ALL__" ? currentWorkspace : "");
+      state.rows.push({
+        officeName: defaultOff,
+        assetType: "",
+        category: "",
+        assetName: "",
+        description: "",
+        serialNo: "",
+        purchaseDate: "",
+        rate: "",
+        units: "",
+        stockRef: "",
+        remarks: ""
+      });
+      saveState();
+      renderRegister();
+    });
+
+    document.getElementById("clearAllBtn").addEventListener("click", () => {
+      if (confirm("Clear all asset rows in the active workspace?")) {
+        state.rows = [];
+        saveState();
+        renderRegister();
+      }
+    });
+
+    document.getElementById("resetRegisterFiltersBtn").addEventListener("click", () => {
+      document.getElementById("searchBox").value = "";
+      document.getElementById("officeFilter").value = "";
+      document.getElementById("typeFilter").value = "";
+      document.getElementById("categoryFilter").value = "";
+      renderRegister();
+    });
+
+    document.getElementById("clearCriteriaBtn").addEventListener("click", () => {
+      document.getElementById("repOffice").value = "";
+      document.getElementById("repType").value = "";
+      document.getElementById("repCategory").value = "";
+      renderReports();
+    });
+
+    document.getElementById("exportCsvBtn").addEventListener("click", exportCsv);
+    document.getElementById("exportJsonBtn").addEventListener("click", exportJsonBackup);
+    document.getElementById("importJsonTriggerBtn").addEventListener("click", () => {
+      document.getElementById("importJsonInput").click();
+    });
+    document.getElementById("importJsonInput").addEventListener("change", (e) => {
+      importJsonBackup(e.target.files[0]);
+      e.target.value = "";
+    });
+
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+    document.getElementById("searchBox").addEventListener("input", renderRegister);
+    document.getElementById("officeFilter").addEventListener("change", renderRegister);
+    document.getElementById("typeFilter").addEventListener("change", renderRegister);
+    document.getElementById("categoryFilter").addEventListener("change", renderRegister);
+
+    document.getElementById("repOffice").addEventListener("change", renderReports);
+    document.getElementById("repType").addEventListener("change", renderReports);
+    document.getElementById("repCategory").addEventListener("change", renderReports);
+
+    populateDropdowns();
+    syncHeaderAndMetaInputs();
+    bindMetaInputs();
+    bindTabs();
+    renderRegister();
+    renderReports();
+  </script>
+</body>
+</html>
